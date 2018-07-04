@@ -253,10 +253,10 @@ function genPrivMapEncrypt(userid, sdkappid, accountType, roomid, priKey, expire
 
 module.exports = {
     genUserSig: function(opt, cb) {
-        //生成privMapEncrypt
-        let privMapEncrypt = genUserSig(opt.userid, opt.sdkappid, opt.accountType, opt.privateKey);
+        //生成userSig
+        let userSig = genUserSig(opt.userid, opt.sdkappid, opt.accountType, opt.privateKey);
 
-        gzcompress(privMapEncrypt, cb);
+        gzcompress(userSig, cb);
     },
     genPrivMapEncrypt: function(opt, cb) {
         //生成privMapEncrypt
@@ -279,7 +279,7 @@ module.exports = {
 
 //test
 const sdkappid = 14000123345;
-const userid = 'zczhu11';
+const userid = 'test_username';
 const roomid = 10000;
 const accountType = 12354;
         
