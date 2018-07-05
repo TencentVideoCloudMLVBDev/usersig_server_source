@@ -190,34 +190,56 @@ function genPrivMapEncrypt(userid, sdkappid, accountType, roomid, priKey, expire
     let expiredTime = time + (expire||300);
     let offset = 0;
     let bytes = new Buffer(1+2+accountLength+4+4+4+4+4);
+
+    //cVer
     bytes[offset++] = 0;
+
+    //wAccountLen
     bytes[offset++] = (accountLength & 0xFF00) >> 8;
     bytes[offset++] = accountLength & 0x00FF;
     
+    //buffAccount
     for (; offset < 3 + accountLength; ++offset) {
         bytes[offset] = userid.charCodeAt(offset - 3);
     }
+
+    //dwSdkAppid
     bytes[offset++] = (sdkappid & 0xFF000000) >> 24;
     bytes[offset++] = (sdkappid & 0x00FF0000) >> 16;
     bytes[offset++] = (sdkappid & 0x0000FF00) >> 8;
     bytes[offset++] = sdkappid & 0x000000FF;
     
+    //dwAuthId
     bytes[offset++] = (roomid & 0xFF000000) >> 24;
     bytes[offset++] = (roomid & 0x00FF0000) >> 16;
     bytes[offset++] = (roomid & 0x0000FF00) >> 8;
     bytes[offset++] = roomid & 0x000000FF;
     
-    
+    //dwExpTime
     bytes[offset++] = (expiredTime & 0xFF000000) >> 24;
     bytes[offset++] = (expiredTime & 0x00FF0000) >> 16;
     bytes[offset++] = (expiredTime & 0x0000FF00) >> 8;
     bytes[offset++] = expiredTime & 0x000000FF;
     
+    //dwPrivilegeMap
+    /*
+        UPB_CREATE, //创建房间
+        UPB_ENTER, //进入房间
+        UPB_SEND_AUDIO, //播语音
+        UPB_RECV_AUDIO, //收语音
+        UPB_SEND_VIDEO, //播视频
+        UPB_RECV_VIDEO, //收视频
+        UPB_SEND_ASSIST, //播辅路
+        UPB_RECV_ASSIST, //收辅路
+
+        按位来，一个8bit； 如0xff代表8个bit都是1，即都有权限。 0x01，只有bit0为1，即只有创建房间权限。"
+    */
     bytes[offset++] = (255 & 0xFF000000) >> 24;
     bytes[offset++] = (255 & 0x00FF0000) >> 16;
     bytes[offset++] = (255 & 0x0000FF00) >> 8;
     bytes[offset++] = 255 & 0x000000FF;
     
+    //dwAccountType
     bytes[offset++] = (0 & 0xFF000000) >> 24;
     bytes[offset++] = (0 & 0x00FF0000) >> 16;
     bytes[offset++] = (0 & 0x0000FF00) >> 8;

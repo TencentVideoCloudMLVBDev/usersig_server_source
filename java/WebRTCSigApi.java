@@ -204,35 +204,58 @@ public class WebRTCSigApi {
         int accountLength = userid.length();
         int offset = 0;
         byte[] bytes = new byte[1+2+accountLength+4+4+4+4+4];
+
+        //cVer
         bytes[offset++] = 0;
+
+        //wAccountLen
         bytes[offset++] = (byte)((accountLength & 0xFF00) >> 8);
         bytes[offset++] = (byte)(accountLength & 0x00FF);
         
+        //buffAccount
         for (; offset < 3 + accountLength; ++offset) {
             bytes[offset] = (byte)userid.charAt(offset - 3);
         }
+
+        //dwSdkAppid
         bytes[offset++] = (byte)((this.mSdkAppid & 0xFF000000) >> 24);
         bytes[offset++] = (byte)((this.mSdkAppid & 0x00FF0000) >> 16);
         bytes[offset++] = (byte)((this.mSdkAppid & 0x0000FF00) >> 8);
         bytes[offset++] = (byte)(this.mSdkAppid & 0x000000FF);
         
+        //dwAuthId
         long nRoomId = Long.valueOf(roomid);
         bytes[offset++] = (byte)((nRoomId & 0xFF000000) >> 24);
         bytes[offset++] = (byte)((nRoomId & 0x00FF0000) >> 16);
         bytes[offset++] = (byte)((nRoomId & 0x0000FF00) >> 8);
         bytes[offset++] = (byte)(nRoomId & 0x000000FF);
         
+        //dwExpTime
         long expiredTime = Long.valueOf(time) + expire;
         bytes[offset++] = (byte)((expiredTime & 0xFF000000) >> 24);
         bytes[offset++] = (byte)((expiredTime & 0x00FF0000) >> 16);
         bytes[offset++] = (byte)((expiredTime & 0x0000FF00) >> 8);
         bytes[offset++] = (byte)(expiredTime & 0x000000FF);
-        
+
+        //dwPrivilegeMap
+        /*
+            UPB_CREATE, //创建房间
+            UPB_ENTER, //进入房间
+            UPB_SEND_AUDIO, //播语音
+            UPB_RECV_AUDIO, //收语音
+            UPB_SEND_VIDEO, //播视频
+            UPB_RECV_VIDEO, //收视频
+            UPB_SEND_ASSIST, //播辅路
+            UPB_RECV_ASSIST, //收辅路
+
+            按位来，一个8bit； 如0xff代表8个bit都是1，即都有权限。 0x01，只有bit0为1，即只有创建房间权限。"
+        */        
         bytes[offset++] = (byte)((255 & 0xFF000000) >> 24);
         bytes[offset++] = (byte)((255 & 0x00FF0000) >> 16);
         bytes[offset++] = (byte)((255 & 0x0000FF00) >> 8);
         bytes[offset++] = (byte)(255 & 0x000000FF);
         
+        //dwAccountType
         bytes[offset++] = (byte)((0 & 0xFF000000) >> 24);
         bytes[offset++] = (byte)((0 & 0x00FF0000) >> 16);
         bytes[offset++] = (byte)((0 & 0x0000FF00) >> 8);

@@ -233,7 +233,22 @@ class WebRTCSigApi {
         $userbuf .= pack('N',$this->sdkappid);          //dwSdkAppid    unsigned int/4  sdkappid
         $userbuf .= pack('N',$roomid);                  //dwAuthId  unsigned int/4  群组号码/音视频房间号
         $userbuf .= pack('N', time() + $expire);        //dwExpTime unsigned int/4  过期时间 （当前时间 + 有效期（单位：秒，建议300秒））
-        $userbuf .= pack('N', hexdec("0xff"));          //dwPrivilegeMap unsigned int/4  权限位      
+
+        //dwPrivilegeMap unsigned int/4  权限位 
+        /*
+            UPB_CREATE, //创建房间
+            UPB_ENTER, //进入房间
+            UPB_SEND_AUDIO, //播语音
+            UPB_RECV_AUDIO, //收语音
+            UPB_SEND_VIDEO, //播视频
+            UPB_RECV_VIDEO, //收视频
+            UPB_SEND_ASSIST, //播辅路
+            UPB_RECV_ASSIST, //收辅路
+
+            按位来，一个8bit； 如0xff代表8个bit都是1，即都有权限。 0x01，只有bit0为1，即只有创建房间权限。"
+        */
+        $userbuf .= pack('N', hexdec("0xff"));
+        
         $userbuf .= pack('N', 0);                       //dwAccountType  unsigned int/4  第三方帐号类型           
 
         $json = Array(
