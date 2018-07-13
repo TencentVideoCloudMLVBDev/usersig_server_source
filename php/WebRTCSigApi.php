@@ -21,7 +21,7 @@ if (version_compare(PHP_VERSION, '7.1.0') >= 0 && !in_array('secp256k1', openssl
 
 
 /**
- * WebRTCSigApi 负责生成userSig和privMapEncrypt
+ * WebRTCSigApi 负责生成userSig和privateMapKey
  */
 class WebRTCSigApi {
     private $sdkappid = 0;         // 在腾讯云注册的sdkappid
@@ -37,7 +37,7 @@ class WebRTCSigApi {
     }
 
     /**
-     * 设置私钥 如果要生成userSig和privMapEncrypt则需要私钥
+     * 设置私钥 如果要生成userSig和privateMapKey则需要私钥
      * @param string $private_key 私钥文件内容
      * @return bool 是否成功
      */
@@ -50,7 +50,7 @@ class WebRTCSigApi {
     }
 
     /**
-     * 设置公钥 如果要验证userSig和privMapEncrypt则需要公钥
+     * 设置公钥 如果要验证userSig和privateMapKey则需要公钥
      * @param string $public_key 公钥文件内容
      * @return bool 是否成功
      */
@@ -152,7 +152,7 @@ class WebRTCSigApi {
      * @return string 按标准格式生成的用于签名的字符串
      * 失败时返回false
      */
-    private function genSignContentForPrivMapEncrypt(array $json) {
+    private function genSignContentForPrivateMapKey(array $json) {
         static $members = Array(
             'TLS.appid_at_3rd',
             'TLS.account_type',
@@ -209,13 +209,13 @@ class WebRTCSigApi {
     }
 
     /**
-     * 生成privMapEncrypt
+     * 生成privateMapKey
      * @param string $userid 用户名
      * @param uint $roomid 房间号
-     * @param uint $expire privMapEncrypt有效期 默认为300秒
-     * @return string 生成的privMapEncrypt 失败时为false
+     * @param uint $expire privateMapKey有效期 默认为300秒
+     * @return string 生成的privateMapKey 失败时为false
      */
-    public function genPrivMapEncrypt($userid, $roomid, $expire = 300) {
+    public function genPrivateMapKey($userid, $roomid, $expire = 300) {
         //视频校验位需要用到的字段
         /*
             cVer    unsigned char/1 版本号，填0
@@ -233,22 +233,7 @@ class WebRTCSigApi {
         $userbuf .= pack('N',$this->sdkappid);          //dwSdkAppid    unsigned int/4  sdkappid
         $userbuf .= pack('N',$roomid);                  //dwAuthId  unsigned int/4  群组号码/音视频房间号
         $userbuf .= pack('N', time() + $expire);        //dwExpTime unsigned int/4  过期时间 （当前时间 + 有效期（单位：秒，建议300秒））
-
-        //dwPrivilegeMap unsigned int/4  权限位 
-        /*
-            UPB_CREATE, //创建房间
-            UPB_ENTER, //进入房间
-            UPB_SEND_AUDIO, //播语音
-            UPB_RECV_AUDIO, //收语音
-            UPB_SEND_VIDEO, //播视频
-            UPB_RECV_VIDEO, //收视频
-            UPB_SEND_ASSIST, //播辅路
-            UPB_RECV_ASSIST, //收辅路
-
-            按位来，一个8bit； 如0xff代表8个bit都是1，即都有权限。 0x01，只有bit0为1，即只有创建房间权限。"
-        */
-        $userbuf .= pack('N', hexdec("0xff"));
-        
+        $userbuf .= pack('N', hexdec("0xff"));          //dwPrivilegeMap unsigned int/4  权限位       
         $userbuf .= pack('N', 0);                       //dwAccountType  unsigned int/4  第三方帐号类型           
 
         $json = Array(
@@ -263,7 +248,7 @@ class WebRTCSigApi {
         );
 
         $err = '';
-        $content = $this->genSignContentForPrivMapEncrypt($json, $err);
+        $content = $this->genSignContentForPrivateMapKey($json, $err);
         $signature = $this->sign($content, $err);
         $json['TLS.sig'] = base64_encode($signature);
         if ($json['TLS.sig'] === false) {
@@ -328,19 +313,19 @@ class WebRTCSigApi {
     }
 
     /**
-     * 验证privMapEncrypt
-     * @param type $privMapEncrypt privMapEncrypt
+     * 验证privateMapKey
+     * @param type $privateMapKey privateMapKey
      * @param type $userid 需要验证用户名
-     * @param type $init_time privMapEncrypt中的生成时间
-     * @param type $expire_time privMapEncrypt中的有效期 如：3600秒
+     * @param type $init_time privateMapKey中的生成时间
+     * @param type $expire_time privateMapKey中的有效期 如：3600秒
      * @param type $userbuf 视频校验位字符串
      * @param type $error_msg 失败时的错误信息
      * @return boolean 验证是否成功
      */
-    public function verifyPrivMapEncrypt($privMapEncrypt, $userid, &$init_time, &$expire_time, &$userbuf, &$error_msg) {
+    public function verifyPrivateMapKey($privateMapKey, $userid, &$init_time, &$expire_time, &$userbuf, &$error_msg) {
         try {
             $error_msg = '';
-            $decoded_sig = $this->base64Decode($privMapEncrypt);
+            $decoded_sig = $this->base64Decode($privateMapKey);
             $uncompressed_sig = gzuncompress($decoded_sig);
             if ($uncompressed_sig === false) {
                 throw new Exception('gzuncompress error');
@@ -356,7 +341,7 @@ class WebRTCSigApi {
             if ($json['TLS.sdk_appid'] != $this->sdkappid) {
                 throw new Exception("sdkappid error sigappid:{$json['TLS.sdk_appid']} thisappid:{$this->sdkappid}");
             }
-            $content = $this->genSignContentForPrivMapEncrypt($json);
+            $content = $this->genSignContentForPrivateMapKey($json);
             $signature = base64_decode($json['TLS.sig']);
             if ($signature == false) {
                 throw new Exception('sig json_decode error');
@@ -399,24 +384,24 @@ class WebRTCSigApi {
 
         //读取公钥的内容
         $public = file_get_contents(dirname(__FILE__).DIRECTORY_SEPARATOR.'public_key');
-        //设置公钥(校验userSig和privMapEncrypt需要用到，校验只是为了验证，实际业务中不需要校验）
+        //设置公钥(校验userSig和privateMapKey需要用到，校验只是为了验证，实际业务中不需要校验）
         $api->SetPublicKey($public);
  
 
-        //生成privMapEncrypt
-        $privMapEncrypt = $api->genPrivMapEncrypt($userid, $roomid);
+        //生成privateMapKey
+        $privateMapKey = $api->genPrivateMapKey($userid, $roomid);
 
         //生成userSig
         $userSig = $api->genUserSig($userid);
 
         //校验
         $result = $api->verifyUserSig($userSig, $userid, $init_time, $expire_time, $error_msg);
-        $result = $api->verifyPrivMapEncrypt($privMapEncrypt, $userid, $init_time, $expire_time, $userbuf, $error_msg);
+        $result = $api->verifyPrivateMapKey($privateMapKey, $userid, $init_time, $expire_time, $userbuf, $error_msg);
 
 
         //打印结果
         $ret =  array(
-            'privMapEncrypt' => $privMapEncrypt,
+            'privateMapKey' => $privateMapKey,
             'userSig' => $userSig
         );
         echo json_encode($ret);

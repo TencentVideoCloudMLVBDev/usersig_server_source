@@ -25,7 +25,7 @@ public class WebRTCSigApi {
     }
     
     /**
-     * 设置私钥 如果要生成userSig和privMapEncrypt则需要私钥
+     * 设置私钥 如果要生成userSig和privateMapKey则需要私钥
      * @param privateKey 私钥文件内容
      */
     public void setPrivateKey(String privateKey) {
@@ -44,7 +44,7 @@ public class WebRTCSigApi {
     }
     
     /**
-     * 设置公钥 如果要验证userSig和privMapEncrypt则需要公钥
+     * 设置公钥 如果要验证userSig和privateMapKey则需要公钥
      * @param publicKey 公钥文件内容
      */
     public void setPublicKey(String publicKey) {
@@ -181,13 +181,13 @@ public class WebRTCSigApi {
     }
     
     /**
-     * 生成privMapEncrypt
+     * 生成privateMapKey
      * @param userid 用户名
      * @param roomid 房间号
-     * @param expire privMapEncrypt有效期，建议为300秒
-     * @return 生成的privMapEncrypt
+     * @param expire privateMapKey有效期，建议为300秒
+     * @return 生成的privateMapKey
      */
-    public String genPrivMapEncrypt(String userid, int roomid, int expire) {
+    public String genPrivateMapKey(String userid, int roomid, int expire) {
         String time = String.valueOf(System.currentTimeMillis()/1000);
         
         //视频校验位需要用到的字段
@@ -237,19 +237,7 @@ public class WebRTCSigApi {
         bytes[offset++] = (byte)((expiredTime & 0x0000FF00) >> 8);
         bytes[offset++] = (byte)(expiredTime & 0x000000FF);
 
-        //dwPrivilegeMap
-        /*
-            UPB_CREATE, //创建房间
-            UPB_ENTER, //进入房间
-            UPB_SEND_AUDIO, //播语音
-            UPB_RECV_AUDIO, //收语音
-            UPB_SEND_VIDEO, //播视频
-            UPB_RECV_VIDEO, //收视频
-            UPB_SEND_ASSIST, //播辅路
-            UPB_RECV_ASSIST, //收辅路
-
-            按位来，一个8bit； 如0xff代表8个bit都是1，即都有权限。 0x01，只有bit0为1，即只有创建房间权限。"
-        */        
+        //dwPrivilegeMap     
         bytes[offset++] = (byte)((255 & 0xFF000000) >> 24);
         bytes[offset++] = (byte)((255 & 0x00FF0000) >> 16);
         bytes[offset++] = (byte)((255 & 0x0000FF00) >> 8);
@@ -295,9 +283,9 @@ public class WebRTCSigApi {
         byte [] compressBytes = new byte [512];
         int compressBytesLength = compresser.deflate(compressBytes);
         compresser.end();
-        String privMapEncrypt = new String(base64UrlEncode(Arrays.copyOfRange(compressBytes, 0, compressBytesLength)));
+        String privateMapKey = new String(base64UrlEncode(Arrays.copyOfRange(compressBytes, 0, compressBytesLength)));
         
-        return privMapEncrypt;
+        return privateMapKey;
     }
     
     
@@ -336,11 +324,11 @@ public class WebRTCSigApi {
         //生成userSig
         String userSig = api.genUserSig(userid, 300);
         
-        //生成privMapEncrypt
-        String privMapEncrypt = api.genPrivMapEncrypt(userid, roomid, 300);
+        //生成privateMapKey
+        String privateMapKey = api.genPrivateMapKey(userid, roomid, 300);
         
         System.out.println("userSig:\n" + userSig);
-        System.out.println("privMapEncrypt:\n" + privMapEncrypt);
+        System.out.println("privateMapKey:\n" + privateMapKey);
     }
     
 }

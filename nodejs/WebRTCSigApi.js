@@ -109,7 +109,7 @@ function genSignContentForUserSig(json) {
  * @param array json 票据json对象
  * @return string 按标准格式生成的用于签名的字符串
  */
-function genSignContentForPrivMapEncrypt(json) {
+function genSignContentForPrivateMapKey(json) {
     let members = {
             'TLS.appid_at_3rd': 1,
             'TLS.account_type': 1,
@@ -164,16 +164,16 @@ function genUserSig(userid, sdkappid, accountType, priKey, expire) {
 }
 
 /**
- * 生成privMapEncrypt
+ * 生成privateMapKey
  * @param string userid 用户名
  * @param uint sdkappid appid
  * @param uint accountType accountType
  * @param uint roomid 房间号
  * @param string priKey 私钥
- * @param uint expire privMapEncrypt有效期 默认为300秒
- * @return string 生成的privMapEncrypt
+ * @param uint expire privateMapKey有效期 默认为300秒
+ * @return string 生成的privateMapKey
  */
-function genPrivMapEncrypt(userid, sdkappid, accountType, roomid, priKey, expire) {
+function genPrivateMapKey(userid, sdkappid, accountType, roomid, priKey, expire) {
     //视频校验位需要用到的字段
     /*
         cVer    unsigned char/1 版本号，填0
@@ -222,18 +222,6 @@ function genPrivMapEncrypt(userid, sdkappid, accountType, roomid, priKey, expire
     bytes[offset++] = expiredTime & 0x000000FF;
     
     //dwPrivilegeMap
-    /*
-        UPB_CREATE, //创建房间
-        UPB_ENTER, //进入房间
-        UPB_SEND_AUDIO, //播语音
-        UPB_RECV_AUDIO, //收语音
-        UPB_SEND_VIDEO, //播视频
-        UPB_RECV_VIDEO, //收视频
-        UPB_SEND_ASSIST, //播辅路
-        UPB_RECV_ASSIST, //收辅路
-
-        按位来，一个8bit； 如0xff代表8个bit都是1，即都有权限。 0x01，只有bit0为1，即只有创建房间权限。"
-    */
     bytes[offset++] = (255 & 0xFF000000) >> 24;
     bytes[offset++] = (255 & 0x00FF0000) >> 16;
     bytes[offset++] = (255 & 0x0000FF00) >> 8;
@@ -260,7 +248,7 @@ function genPrivMapEncrypt(userid, sdkappid, accountType, roomid, priKey, expire
         'TLS.userbuf': userbufstr
     };
 
-    let content = genSignContentForPrivMapEncrypt(json);
+    let content = genSignContentForPrivateMapKey(json);
 
     let signature = sign(content, priKey);
     json['TLS.sig'] = signature.toString("base64");
@@ -280,18 +268,18 @@ module.exports = {
 
         gzcompress(userSig, cb);
     },
-    genPrivMapEncrypt: function(opt, cb) {
-        //生成privMapEncrypt
-        let privMapEncrypt = genPrivMapEncrypt(opt.userid, opt.sdkappid, opt.accountType, opt.roomid, opt.privateKey);
+    genPrivateMapKey: function(opt, cb) {
+        //生成privateMapKey
+        let privateMapKey = genPrivateMapKey(opt.userid, opt.sdkappid, opt.accountType, opt.roomid, opt.privateKey);
 
-        gzcompress(privMapEncrypt, cb);
+        gzcompress(privateMapKey, cb);
     },
     gen: function(opt, cb) {        
         var self = this;
         this.genUserSig(opt, function(err1, sig) {
-            self.genPrivMapEncrypt(opt, function(err2, enc) {
+            self.genPrivateMapKey(opt, function(err2, enc) {
                 cb && cb(err1||err2, {
-                    privMapEncrypt: enc,
+                    privateMapKey: enc,
                     userSig: sig
                 })
             });
@@ -310,12 +298,12 @@ const accountType = 12354;
 let privateKey = fs.readFileSync(path.resolve(__dirname, './private_key'));	
 let publicKey = fs.readFileSync(path.resolve(__dirname, './public_key'));
 
-//生成privMapEncrypt
-let privMapEncrypt = genPrivMapEncrypt(userid, sdkappid, accountType, roomid, privateKey, 60*60);
+//生成privateMapKey
+let privateMapKey = genPrivateMapKey(userid, sdkappid, accountType, roomid, privateKey, 60*60);
 
-gzcompress(privMapEncrypt, function(err,ret){
+gzcompress(privateMapKey, function(err,ret){
 	if(ret) {
-		console.log('privMapEncrypt');
+		console.log('privateMapKey');
 		console.log(ret);
 	}
 });
