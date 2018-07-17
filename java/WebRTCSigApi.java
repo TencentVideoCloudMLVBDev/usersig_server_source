@@ -140,7 +140,7 @@ public class WebRTCSigApi {
     /**
      * 生成userSig
      * @param userid 用户名
-     * @param expire userSig有效期，建议为300秒
+     * @param expire userSig有效期，出于安全考虑建议为300秒，您可以根据您的业务场景设置其他值。
      * @return 生成的userSig
      */
     public String genUserSig(String userid, int expire) {
@@ -184,7 +184,7 @@ public class WebRTCSigApi {
      * 生成privateMapKey
      * @param userid 用户名
      * @param roomid 房间号
-     * @param expire privateMapKey有效期，建议为300秒
+     * @param expire privateMapKey有效期，出于安全考虑建议为300秒，您可以根据您的业务场景设置其他值。
      * @return 生成的privateMapKey
      */
     public String genPrivateMapKey(String userid, int roomid, int expire) {

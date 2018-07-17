@@ -176,7 +176,7 @@ class WebRTCSigApi {
     /**
      * 生成userSig
      * @param string $userid 用户名
-     * @param uint $expire userSig有效期 默认为300秒
+     * @param uint $expire userSig有效期，出于安全考虑建议为300秒，您可以根据您的业务场景设置其他值。
      * @return string 生成的userSig 失败时为false
      */
     public function genUserSig($userid, $expire = 300) {
@@ -212,7 +212,7 @@ class WebRTCSigApi {
      * 生成privateMapKey
      * @param string $userid 用户名
      * @param uint $roomid 房间号
-     * @param uint $expire privateMapKey有效期 默认为300秒
+     * @param uint $expire privateMapKey有效期，出于安全考虑建议为300秒，您可以根据您的业务场景设置其他值。
      * @return string 生成的privateMapKey 失败时为false
      */
     public function genPrivateMapKey($userid, $roomid, $expire = 300) {

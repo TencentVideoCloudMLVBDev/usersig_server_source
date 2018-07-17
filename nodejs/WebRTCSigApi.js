@@ -136,7 +136,7 @@ function genSignContentForPrivateMapKey(json) {
  * @param uint sdkappid appid
  * @param uint accountType
  * @param string priKey 私钥
- * @param uint expire userSig有效期 默认为300秒
+ * @param uint expire userSig有效期，出于安全考虑建议为300秒，您可以根据您的业务场景设置其他值。
  * @return string 生成的userSig
  */
 function genUserSig(userid, sdkappid, accountType, priKey, expire) {
@@ -170,7 +170,7 @@ function genUserSig(userid, sdkappid, accountType, priKey, expire) {
  * @param uint accountType accountType
  * @param uint roomid 房间号
  * @param string priKey 私钥
- * @param uint expire privateMapKey有效期 默认为300秒
+ * @param uint expire privateMapKey有效期，出于安全考虑建议为300秒，您可以根据您的业务场景设置其他值。
  * @return string 生成的privateMapKey
  */
 function genPrivateMapKey(userid, sdkappid, accountType, roomid, priKey, expire) {
