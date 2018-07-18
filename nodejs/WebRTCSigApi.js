@@ -264,14 +264,24 @@ function genPrivateMapKey(userid, sdkappid, accountType, roomid, priKey, expire)
 module.exports = {
     genUserSig: function(opt, cb) {
         //生成userSig
-        let userSig = genUserSig(opt.userid, opt.sdkappid, opt.accountType, opt.privateKey);
-
+        try{
+            var userSig = genUserSig(opt.userid, opt.sdkappid, opt.accountType, opt.privateKey);
+        }
+        catch(error){
+           cb(error,null);
+           return;
+       }
         gzcompress(userSig, cb);
     },
     genPrivateMapKey: function(opt, cb) {
         //生成privateMapKey
-        let privateMapKey = genPrivateMapKey(opt.userid, opt.sdkappid, opt.accountType, opt.roomid, opt.privateKey);
-
+        try{ 
+           var privateMapKey = genPrivateMapKey(opt.userid, opt.sdkappid, opt.accountType, opt.roomid, opt.privateKey);
+       }
+       catch(error){
+           cb(error,null);
+           return;
+       }
         gzcompress(privateMapKey, cb);
     },
     gen: function(opt, cb) {        
