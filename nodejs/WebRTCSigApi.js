@@ -309,7 +309,7 @@ let privateKey = fs.readFileSync(path.resolve(__dirname, './private_key'));
 let publicKey = fs.readFileSync(path.resolve(__dirname, './public_key'));
 
 //生成privateMapKey
-let privateMapKey = genPrivateMapKey(userid, sdkappid, accountType, roomid, privateKey, 60*60);
+let privateMapKey = genPrivateMapKey(userid, sdkappid, accountType, roomid, privateKey, 300);
 
 gzcompress(privateMapKey, function(err,ret){
 	if(ret) {
@@ -319,7 +319,7 @@ gzcompress(privateMapKey, function(err,ret){
 });
 
 //生成userSig
-let userSig = genUserSig(userid, sdkappid, accountType, privateKey, 60*60);
+let userSig = genUserSig(userid, sdkappid, accountType, privateKey, 300);
 		
 //打印结果
 gzcompress(userSig, function(err,ret){
