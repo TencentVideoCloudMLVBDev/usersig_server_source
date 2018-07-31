@@ -270,7 +270,7 @@ class WebRTCSigApi {
      * @param type $userSig userSig
      * @param type $userid 需要验证用户名
      * @param type $init_time usersig中的生成时间
-     * @param type $expire_time usersig中的有效期 如：3600秒
+     * @param type $expire_time usersig中的有效期 如：300秒
      * @param type $error_msg 失败时的错误信息
      * @return boolean 验证是否成功
      */
@@ -317,7 +317,7 @@ class WebRTCSigApi {
      * @param type $privateMapKey privateMapKey
      * @param type $userid 需要验证用户名
      * @param type $init_time privateMapKey中的生成时间
-     * @param type $expire_time privateMapKey中的有效期 如：3600秒
+     * @param type $expire_time privateMapKey中的有效期 如：300秒
      * @param type $userbuf 视频校验位字符串
      * @param type $error_msg 失败时的错误信息
      * @return boolean 验证是否成功
