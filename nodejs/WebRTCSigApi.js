@@ -311,8 +311,10 @@ let publicKey = fs.readFileSync(path.resolve(__dirname, './public_key'));
 //生成privateMapKeyObject
 let privateMapKeyObject = genPrivateMapKey(userid, sdkappid, accountType, roomid, privateKey, 300);
 
+//最后一步，组装privateMapKey
 gzcompress(privateMapKeyObject, function(err,privateMapKey){
 	if(privateMapKey) {
+		//打印结果
 		console.log('privateMapKey');
 		console.log(privateMapKey);
 	}
@@ -320,10 +322,11 @@ gzcompress(privateMapKeyObject, function(err,privateMapKey){
 
 //生成userSigObject
 let userSigObject = genUserSig(userid, sdkappid, accountType, privateKey, 300);
-		
-//打印结果
+
+//最后一步，组装usersig		
 gzcompress(userSigObject, function(err,userSig){
     if(userSig) {
+	//打印结果
         console.log('userSig');
         console.log(userSig);
     }
