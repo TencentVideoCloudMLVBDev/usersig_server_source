@@ -308,23 +308,23 @@ const accountType = 12354;
 let privateKey = fs.readFileSync(path.resolve(__dirname, './private_key'));	
 let publicKey = fs.readFileSync(path.resolve(__dirname, './public_key'));
 
-//生成privateMapKey
-let privateMapKey = genPrivateMapKey(userid, sdkappid, accountType, roomid, privateKey, 300);
+//生成privateMapKeyObject
+let privateMapKeyObject = genPrivateMapKey(userid, sdkappid, accountType, roomid, privateKey, 300);
 
-gzcompress(privateMapKey, function(err,ret){
-	if(ret) {
+gzcompress(privateMapKeyObject, function(err,privateMapKey){
+	if(privateMapKey) {
 		console.log('privateMapKey');
-		console.log(ret);
+		console.log(privateMapKey);
 	}
 });
 
-//生成userSig
-let userSig = genUserSig(userid, sdkappid, accountType, privateKey, 300);
+//生成userSigObject
+let userSigObject = genUserSig(userid, sdkappid, accountType, privateKey, 300);
 		
 //打印结果
-gzcompress(userSig, function(err,ret){
-    if(ret) {
+gzcompress(userSigObject, function(err,userSig){
+    if(userSig) {
         console.log('userSig');
-        console.log(ret);
+        console.log(userSig);
     }
 });
